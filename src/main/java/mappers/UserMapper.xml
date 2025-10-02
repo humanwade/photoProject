@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.javassem.UserMapper">
+
+	<!-- email 중복 확인 -->
+	<select id='emailOverlap' resultType="int" parameterType="String">
+		SELECT COUNT(userEmail)
+		FROM user
+		WHERE userEmail = #{userEmail}
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id='insertUser' parameterType="com.javaclass.domain.UserVO">
+		INSERT INTO user(userEmail, userPassword, userName, userBirth, userTel, userCreateDate)
+		VALUES(#{userEmail}, #{userPassword}, #{userName}, #{userBirth}, #{userTel}, NOW())
+	</insert>
+
+	<!-- 로그인 확인 -->
+	<select id='loginCheck' resultType="com.javaclass.domain.UserVO" parameterType="com.javaclass.domain.UserVO">
+		SELECT userName, userEmail, userPassword
+		FROM user
+		WHERE userEmail = #{userEmail} AND userPassword = #{userPassword}
+	</select>
+
+	<!-- 이메일 찾기 -->
+	<select id='findEmail' resultType="com.javaclass.domain.UserVO" parameterType="com.javaclass.domain.UserVO">
+		SELECT userEmail
+		FROM user
+		WHERE userEmail = #{userEmail} AND userPassword = #{userPassword}
+	</select>
+
+	<!-- 비밀번호 찾기 -->
+	<select id='findPassword' resultType="com.javaclass.domain.UserVO" parameterType="com.javaclass.domain.UserVO">
+		SELECT userName, userEmail, userPassword
+		FROM user
+		WHERE userName = #{userName} AND userTel = #{userTel}
+	</select>
+
+	<!-- 사용자 목록 -->
+	<select id="getUserBoardList" parameterType="hashmap" resultType="com.javaclass.domain.UserVO">
+		SELECT userName, userPassword, userEmail, userBirth, userTel, userCreateDate
+		FROM user
+		<where>
+			<if test="searchCondition != null">
+				${searchCondition} LIKE '%${searchKeyword}%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 사용자 삭제 -->
+	<delete id="deleteUserBoard" parameterType="com.javaclass.domain.UserVO">
+		DELETE FROM user
+		WHERE userEmail = #{userEmail}
+	</delete>
+
+	<!-- 사용자 정보 조회 -->
+	<select id="modifyUserBoard" parameterType="com.javaclass.domain.UserVO" resultType="com.javaclass.domain.UserVO">
+		SELECT userName, userPassword, userEmail, userBirth, userTel
+		FROM user
+		WHERE userEmail = #{userEmail}
+	</select>
+
+	<!-- 사용자 정보 수정 -->
+	<update id="updateUserBoard" parameterType="com.javaclass.domain.UserVO">
+		UPDATE user SET
+		userPassword = #{userPassword},
+		userName = #{userName},
+		userBirth = #{userBirth},
+		userTel = #{userTel}
+		WHERE userEmail = #{userEmail}
+	</update>
+
+</mapper>
